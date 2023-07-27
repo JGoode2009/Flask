@@ -16,5 +16,7 @@ db.init_app(app)
 bcrypt = Bcrypt(app)
 login_manager=LoginManager(app)
 login_manager.login_view = 'login' # login manager needs this for the redirect to login for login required pages
+login_manager.login_message_category = 'info' # styling for bootstrap classes
+
 
 from flaskblog import routes

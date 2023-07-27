@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, Request
 from flaskblog import app, db, bcrypt   
 from flaskblog.forms import RegistrationForm, LoginForm
 from flaskblog.models import User, Post
@@ -66,8 +66,9 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
-            return redirect(url_for('home'))
+            login_user(user, remember=form.remember.data) #using get method instead of [key] in case it doesn't exist
+            next_page = request.args.get('next')
+            return redirect(next_page)if next_page else redirect(url_for('home'))
         else:
             flash('login unsuccesful. Check email/password', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -77,7 +78,10 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route("/accout")
+@app.route("/account")
 @login_required
 def account():
-    return render_template('account.html', title='acount')
+    print(" current user image file=", current_user.image_file)
+    image_file = "http://localhost:5000/static/profile_pics/default.jpg"
+    #url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title='acount', image_file=image_file)
