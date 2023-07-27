@@ -1,7 +1,15 @@
 from datetime import datetime
-from flaskblog import app, db
+from flaskblog import app, db, login_manager
+from flask_login import UserMixin
 
-class User(db.Model):
+
+#creating a decorator using login manager
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(20), unique=True, nullable=False)
@@ -40,7 +48,6 @@ def add_user_to_database(username, email, password):
         whole_table = User.query.all() #for testing that db is successfully updated
         print(whole_table) # same note as above
 # add_user_to_database('Mehcad Brooks', 'superman@place.net', 'iewiwo')
-
 
 def add_post_to_database(title, content, user_id):
     # created this function mostly to test if the db and its models were connected and working
